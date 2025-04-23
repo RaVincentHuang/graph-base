@@ -1,6 +1,9 @@
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::Hash;
 use crate::interfaces::graph::Graph;
+
+use crate::interfaces::graph::{Adjacency, SingleId, IdPair};
 
 
 pub trait Label: Hash + Eq + Clone + Display {
@@ -24,4 +27,32 @@ impl Label for String {
 pub trait HyperLabeled<'a>: Labeled<'a> {
     type L: Label;
     fn set_same_label_fn(&mut self, f: Box<dyn Fn(&Self::L, &Self::L) -> bool>);
+}
+
+pub struct LabeledAdjacencyList<'a, T: Graph<'a>>(HashMap<&'a T::Node, Vec<(&'a T::Node, &'a T::Edge)>>);
+
+pub trait LabeledAdjacency<'a>: Adjacency<'a> + Labeled<'a> 
+where <Self as Graph<'a>>::Edge: IdPair {
+    fn get_labeled_adj(&'a self) -> LabeledAdjacencyList<'a, Self> {
+
+        let mut id_map = HashMap::new();
+        for node in self.nodes() {
+            id_map.insert(node.id(), node);
+        }
+
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        
+        for edge in self.edges() {
+            let (src, dst) = (id_map.get(&edge.pair().0).unwrap(), id_map.get(&edge.pair().1).unwrap());
+            adj.get_mut(src).unwrap().push((dst.clone(), edge));
+        }
+
+        LabeledAdjacencyList(adj)
+    }
+    fn get_labeled_post(&'a self, adj: &LabeledAdjacencyList<'a, Self>, node: &Self::Node) -> impl Iterator<Item = (&'a Self::Node, &'a Self::Edge)> {
+        adj.0.get(node).expect(format!("No node in adjacency table named {}", node).as_str()).iter().copied()
+    }
 }
