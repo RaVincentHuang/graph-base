@@ -6,6 +6,7 @@ use crate::interfaces::graph::Graph;
 use crate::interfaces::graph::{Adjacency, SingleId, IdPair};
 
 
+/// Label for `Node`
 pub trait Label: Hash + Eq + Clone + Display {
     fn label(&self) -> &str;
 }
