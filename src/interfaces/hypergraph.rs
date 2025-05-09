@@ -1,13 +1,17 @@
 use std::{collections::{HashMap, HashSet}, fmt::Display, hash::Hash};
 use crate::interfaces::graph::{SingleId, IdPair};
+use crate::interfaces::edge::Hyperedge;
+
+use super::{edge::DirectedHyperedge, vertex::Vertex};
 
 pub trait IdVector {
     fn id(&self) -> Vec<usize>;
 }
 
 pub trait Hypergraph<'a> {
-    type Node: Eq + Hash + Clone + Sized + Display + SingleId;
+    type Node: Vertex;
     type Edge: Hyperedge;
+    fn new() -> Self;
     fn nodes(&'a self) -> impl Iterator<Item = &'a Self::Node>;
     fn hyperedges(&'a self) -> impl Iterator<Item = &'a Self::Edge>;
     fn get_hyperedges_vector(&'a self) -> impl Iterator<Item = Vec<&'a Self::Node>> {
@@ -22,10 +26,6 @@ pub trait Hypergraph<'a> {
     fn add_hyperedge(&mut self, edge: Self::Edge);
 }
 
-pub trait Hyperedge: Eq + Hash + Clone + IdVector {
-    fn is_subset(&self, other: &Self) -> bool;
-    fn is_equal(&self, other: &Self) -> bool;
-}
 
 pub struct AdjacencyList<'a, T: Hypergraph<'a>>(HashMap<&'a T::Node, Vec<&'a T::Node>>);
 
@@ -46,3 +46,6 @@ where T: Hypergraph<'a> {
         write!(f, "{}", s)
     }
 }
+
+pub trait DirectedHypergraph<'a>: Hypergraph<'a> + Sized 
+where Self::Edge: DirectedHyperedge {}

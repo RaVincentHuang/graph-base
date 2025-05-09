@@ -1,5 +1,8 @@
+use interfaces::hypergraph::{DirectedHypergraph, Hypergraph};
+
 pub mod interfaces;
 pub mod impls;
+pub mod generator;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
@@ -15,3 +18,4 @@ mod tests {
         assert_eq!(result, 4);
     }
 }
+

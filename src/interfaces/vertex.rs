@@ -1,9 +1,11 @@
 use std::{collections::HashMap, fmt::Display, hash::Hash};
 use crate::interfaces::graph::{SingleId, IdPair};
 
-pub trait Vertex: Eq + Hash + Clone + Sized + Display + SingleId {
+// pub trait Vertex: Eq + Hash + Clone + Sized + Display + SingleId {
     
-}
+// }
+
+pub trait Vertex: Eq + Hash + Clone + Sized + Display + SingleId {}
 
 // pub struct VertexWrapper<T: Vertex>(pub T);
 

@@ -3,6 +3,7 @@ use std::fmt::Display;
 
 use crate::interfaces::labeled::{Label, Labeled, HyperLabeled, LabeledAdjacency};
 use crate::interfaces::graph::{SingleId, IdPair, Graph, Adjacency, AdjacencyInv, Directed};
+use crate::interfaces::vertex::Vertex;
 
 #[derive(Hash, Eq, PartialEq, Clone)]
 pub struct LabelNode<L: Label> {
@@ -94,6 +95,13 @@ impl<'a> Graph<'a> for StandardLabeledGraph {
 
     type Edge = LabeledEdge<SingleLabel>;
 
+    fn new() -> Self {
+        StandardLabeledGraph {
+            nodes: Vec::new(),
+            edges: Vec::new(),
+        }
+    }
+
     fn nodes(&'a self) -> impl Iterator<Item = &'a Self::Node> {
         self.nodes.iter()
     }
@@ -181,6 +189,8 @@ impl Display for StandardLabeledGraph {
         write!(f, "{}", s)
     }
 }
+impl<L: Label> Vertex for LabelNode<L> {}
+
 pub struct HyperLabelGraph<L: Label> {
     nodes: Vec<LabelNode<L>>,
     edges: Vec<LabeledEdge<SingleLabel>>,
@@ -190,6 +200,14 @@ pub struct HyperLabelGraph<L: Label> {
 impl<'a, L: Label> Graph<'a> for HyperLabelGraph<L> {
     type Node = LabelNode<L>;
     type Edge = LabeledEdge<SingleLabel>;
+
+    fn new() -> Self {
+        HyperLabelGraph {
+            nodes: Vec::new(),
+            edges: Vec::new(),
+            same_label_fn: None,
+        }
+    }
 
     fn nodes(&'a self) -> impl Iterator<Item = &'a Self::Node> {
         self.nodes.iter()

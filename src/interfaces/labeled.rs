@@ -11,7 +11,7 @@ pub trait Label: Hash + Eq + Clone + Display {
     fn label(&self) -> &str;
 }
 
-pub trait Labeled<'a>: Graph<'a> {
+pub trait Labeled<'a>: Graph<'a>  {
     fn label_same(&self, node: &Self::Node, label: &Self::Node) -> bool;
     fn get_label(&'a self, node: &'a Self::Node) -> &'a impl Label;
     fn get_edges_pair_label(&'a self) -> impl Iterator<Item = (&'a Self::Node, &'a Self::Node, &'a impl Label)>;

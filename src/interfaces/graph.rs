@@ -1,8 +1,11 @@
 use std::{collections::HashMap, fmt::Display, hash::Hash};
 
+use super::vertex::Vertex;
+
 pub trait Graph<'a> {
-    type Node: Eq + Hash + Clone + Sized + Display + SingleId;
+    type Node: Vertex;
     type Edge: Eq + Hash + Clone + IdPair;
+    fn new() -> Self;
     fn nodes(&'a self) -> impl Iterator<Item = &'a Self::Node>;
     fn edges(&'a self) -> impl Iterator<Item = &'a Self::Edge>;
     fn get_edges_pair(&'a self) -> impl Iterator<Item = (&'a Self::Node, &'a Self::Node)> {
@@ -26,6 +29,8 @@ pub trait IdPair {
 }
 
 pub trait Directed {}
+
+pub trait UnDirected {}
 
 pub struct AdjacencyList<'a, T: Graph<'a>>(HashMap<&'a T::Node, Vec<&'a T::Node>>);
 

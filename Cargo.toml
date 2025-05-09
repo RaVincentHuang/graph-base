@@ -12,3 +12,4 @@ members = []
 default = []
 
 [dependencies]
+rand = "0.9.1"
