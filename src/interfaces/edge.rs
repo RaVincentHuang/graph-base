@@ -42,7 +42,6 @@ where T: DirectedHyperedge {
 
 // A hyperedge is only a set of nodes.
 pub trait NodeSet: Hyperedge {
-    type Node;
     fn from_nodes(nodes: Vec<usize>) -> Self;
 }
 
