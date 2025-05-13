@@ -1,5 +1,5 @@
-use std::{collections::HashMap, fmt::Display, hash::Hash};
-use crate::interfaces::graph::{SingleId, IdPair};
+use std::{fmt::Display, hash::Hash};
+use crate::interfaces::graph::SingleId;
 
 // pub trait Vertex: Eq + Hash + Clone + Sized + Display + SingleId {
     

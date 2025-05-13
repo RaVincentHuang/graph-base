@@ -1,5 +1,5 @@
-use std::{collections::{HashMap, HashSet}, fmt::Display, hash::Hash};
-use crate::interfaces::graph::{SingleId, IdPair};
+use std::{collections::HashMap, fmt::Display};
+use crate::interfaces::graph::SingleId;
 use crate::interfaces::edge::Hyperedge;
 
 use super::{edge::DirectedHyperedge, vertex::Vertex};
