@@ -30,7 +30,8 @@ pub trait Hypergraph<'a> {
 pub struct AdjacencyList<'a, T: Hypergraph<'a>>(HashMap<&'a T::Node, Vec<&'a T::Node>>);
 
 impl<'a, T> Display for AdjacencyList<'a, T> 
-where T: Hypergraph<'a> {    
+where 
+    T: Hypergraph<'a> {    
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut s = String::new();
         for (node, adj) in self.0.iter() {
@@ -48,4 +49,116 @@ where T: Hypergraph<'a> {
 }
 
 pub trait DirectedHypergraph<'a>: Hypergraph<'a> + Sized 
-where Self::Edge: DirectedHyperedge {}
+where 
+    Self::Edge: DirectedHyperedge {}
+
+pub trait Neighbor<'a>: Hypergraph<'a> + Sized {
+    fn get_neighbors(&'a self) -> AdjacencyList<'a, Self> {
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        for edge in self.hyperedges() {
+            let nodes = edge.id();
+            for i in 0..nodes.len() {
+                for j in (i + 1)..nodes.len() {
+                    let node1 = self.nodes().find(|node| node.id() == nodes[i]).unwrap();
+                    let node2 = self.nodes().find(|node| node.id() == nodes[j]).unwrap();
+                    adj.get_mut(node1).unwrap().push(node2);
+                    adj.get_mut(node2).unwrap().push(node1);
+                }
+            }
+        }
+        AdjacencyList(adj)
+    }
+
+    fn neighbors(&'a self, adj: &AdjacencyList<'a, Self>, node: &Self::Node) -> impl Iterator<Item = &'a Self::Node> {
+        adj.0.get(node).unwrap().iter().cloned()
+    }
+}
+
+pub trait Precursor<'a>: DirectedHypergraph<'a>
+where
+    Self::Edge: DirectedHyperedge, {
+    fn get_precursor(&'a self) -> AdjacencyList<'a, Self> {
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        for edge in self.hyperedges() {
+            let nodes = edge.id();
+            for i in 0..nodes.len() {
+                for j in (i + 1)..nodes.len() {
+                    let node1 = self.nodes().find(|node| node.id() == nodes[i]).unwrap();
+                    let node2 = self.nodes().find(|node| node.id() == nodes[j]).unwrap();
+                    adj.get_mut(node2).unwrap().push(node1);
+                }
+            }
+        }
+        AdjacencyList(adj)
+    }
+}
+
+pub trait Successor<'a>: DirectedHypergraph<'a>
+where
+    Self::Edge: DirectedHyperedge, {
+    fn get_postcursor(&'a self) -> AdjacencyList<'a, Self> {
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        for edge in self.hyperedges() {
+            let nodes = edge.id();
+            for i in 0..nodes.len() {
+                for j in (i + 1)..nodes.len() {
+                    let node1 = self.nodes().find(|node| node.id() == nodes[i]).unwrap();
+                    let node2 = self.nodes().find(|node| node.id() == nodes[j]).unwrap();
+                    adj.get_mut(node1).unwrap().push(node2);
+                }
+            }
+        }
+        AdjacencyList(adj)
+    }
+}
+
+pub struct HyperedgeList<'a, T: Hypergraph<'a>>(HashMap<&'a T::Node, Vec<&'a T::Edge>>);
+
+impl<'a, T> Display for HyperedgeList<'a, T> 
+where 
+    T: Hypergraph<'a> {    
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        for (node, edges) in self.0.iter() {
+            
+            let s1 = format!("{}", node);
+            let mut s2 = String::new();
+            for edge in edges {
+                // s2.push_str(format!("{}, ", edge).as_str());
+            }
+
+            s.push_str(format!("Node {} -> {{{}}}\n", s1, s2).as_str());
+        }
+        write!(f, "{}", s)
+    }
+}
+
+pub trait ContainsHyperedge<'a>: Hypergraph<'a> + Sized {
+    fn get_hyperedges_list(&'a self) -> HyperedgeList<'a, Self> {
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        for edge in self.hyperedges() {
+            let nodes = edge.id();
+            for i in 0..nodes.len() {
+                let node = self.nodes().find(|node| node.id() == nodes[i]).unwrap();
+                adj.get_mut(node).unwrap().push(edge);
+            }
+        }
+        HyperedgeList(adj)
+    }
+
+    fn contained_hyperedges(&'a self, adj: &HyperedgeList<'a, Self>, node: &Self::Node) -> impl Iterator<Item = &'a Self::Edge> {
+        adj.0.get(node).unwrap().iter().cloned()
+    }
+}
