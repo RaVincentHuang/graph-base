@@ -142,7 +142,7 @@ where
     }
 }
 
-pub trait ContainsHyperedge<'a>: Hypergraph<'a> + Sized {
+pub trait ContainedHyperedge<'a>: Hypergraph<'a> + Sized {
     fn get_hyperedges_list(&'a self) -> HyperedgeList<'a, Self> {
         let mut adj = HashMap::new();
         for node in self.nodes() {
