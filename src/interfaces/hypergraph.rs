@@ -162,3 +162,38 @@ pub trait ContainedHyperedge<'a>: Hypergraph<'a> + Sized {
         adj.0.get(node).unwrap().iter().cloned()
     }
 }
+pub trait ContainedDirectedHyperedge<'a>: DirectedHypergraph<'a> + Sized
+where 
+    Self::Edge: DirectedHyperedge {
+    fn contained_hyperedges(&'a self, adj: &HyperedgeList<'a, Self>, node: &Self::Node) -> impl Iterator<Item = &'a Self::Edge> {
+        adj.0.get(node).unwrap().iter().cloned()
+    }
+
+    fn get_hyperedges_src(&'a self) -> HyperedgeList<'a, Self> {
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        for edge in self.hyperedges() {
+            for id in edge.src() {
+                let node = self.nodes().find(|node| node.id() == id).unwrap();
+                adj.get_mut(node).unwrap().push(edge);
+            }
+        }
+        HyperedgeList(adj)
+    }
+    fn get_hyperedges_dst(&'a self) -> HyperedgeList<'a, Self> {
+        let mut adj = HashMap::new();
+        for node in self.nodes() {
+            adj.insert(node, Vec::new());
+        }
+        for edge in self.hyperedges() {
+            for id in edge.dst() {
+                let node = self.nodes().find(|node| node.id() == id).unwrap();
+                adj.get_mut(node).unwrap().push(edge);
+            }    
+        }
+        HyperedgeList(adj)
+    }
+    
+}
